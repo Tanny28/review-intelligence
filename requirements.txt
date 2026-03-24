@@ -11,6 +11,7 @@ transformers
 scikit-learn
 vaderSentiment
 textblob
+--extra-index-url https://download.pytorch.org/whl/cpu
 torch
 
 # Data
