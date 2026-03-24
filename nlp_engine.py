@@ -12,7 +12,13 @@ nltk.download('vader_lexicon', quiet=True)
 nltk.download('stopwords', quiet=True)
 nltk.download('punkt', quiet=True)
 
-nlp = spacy.load("en_core_web_sm")
+try:
+    nlp = spacy.load("en_core_web_sm")
+except OSError:
+    print("Downloading Spacy en_core_web_sm model...")
+    import spacy.cli
+    spacy.cli.download("en_core_web_sm")
+    nlp = spacy.load("en_core_web_sm")
 
 _bert_pipeline = None
 
