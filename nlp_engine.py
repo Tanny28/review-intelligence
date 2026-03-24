@@ -8,14 +8,19 @@ from sklearn.preprocessing import LabelEncoder
 import numpy as np
 from datetime import datetime, timedelta
 
+nltk.download('vader_lexicon', quiet=True)
+nltk.download('stopwords', quiet=True)
+nltk.download('punkt', quiet=True)
+try:
+    nltk.download('punkt_tab', quiet=True)
+except Exception:
+    pass
+
 _nlp = None
 
 def get_spacy():
     global _nlp
     if _nlp is None:
-        nltk.download('vader_lexicon', quiet=True)
-        nltk.download('stopwords', quiet=True)
-        nltk.download('punkt', quiet=True)
         try:
             nltk.download('punkt_tab', quiet=True)
         except Exception:
