@@ -8,17 +8,27 @@ from sklearn.preprocessing import LabelEncoder
 import numpy as np
 from datetime import datetime, timedelta
 
-nltk.download('vader_lexicon', quiet=True)
-nltk.download('stopwords', quiet=True)
-nltk.download('punkt', quiet=True)
+_nlp = None
 
-try:
-    nlp = spacy.load("en_core_web_sm")
-except OSError:
-    print("Downloading Spacy en_core_web_sm model...")
-    import spacy.cli
-    spacy.cli.download("en_core_web_sm")
-    nlp = spacy.load("en_core_web_sm")
+def get_spacy():
+    global _nlp
+    if _nlp is None:
+        nltk.download('vader_lexicon', quiet=True)
+        nltk.download('stopwords', quiet=True)
+        nltk.download('punkt', quiet=True)
+        try:
+            nltk.download('punkt_tab', quiet=True)
+        except Exception:
+            pass
+            
+        try:
+            _nlp = spacy.load("en_core_web_sm")
+        except OSError:
+            import spacy.cli
+            spacy.cli.download("en_core_web_sm")
+            _nlp = spacy.load("en_core_web_sm")
+            
+    return _nlp
 
 _bert_pipeline = None
 
@@ -107,7 +117,8 @@ def classify_aspect(text, industry):
     return best if scores[best] > 0 else "General"
 
 def extract_entities(text):
-    doc = nlp(text)
+    nlp_model = get_spacy()
+    doc = nlp_model(text)
     entities = [(ent.text, ent.label_) for ent in doc.ents]
     return entities
 
