@@ -1,0 +1,42 @@
+# Web scraping
+requests
+beautifulsoup4
+selenium
+
+# NLP & ML
+nltk
+spacy
+transformers
+scikit-learn
+vaderSentiment
+textblob
+torch
+
+# Data
+pandas
+
+# Visualization
+plotly
+
+# Dashboard
+streamlit
+
+# API
+flask
+
+# PDF export
+reportlab
+
+# AI summary
+groq
+
+# Google Generative AI (kept for reference, using groq instead)
+# google-generativeai
+
+# Environment variables
+python-dotenv
+
+# Production
+flask-limiter
+gunicorn
+fake-useragent
