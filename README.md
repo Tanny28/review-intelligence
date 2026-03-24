@@ -20,6 +20,12 @@
 - **Frontend Dashboard:** [review-intelligence.streamlit.app](https://review-intelligence.streamlit.app/)
 - **Microservice API:** [review-intelligence.onrender.com](https://review-intelligence.onrender.com) (Rate Limited)
 
+<p align="center">
+  <img src="dashboard1.png" alt="Dashboard Metrics Demo" width="800">
+  <br><br>
+  <img src="dashboard2.png" alt="Dashboard Crisis Alerts Demo" width="800">
+</p>
+
 ---
 
 ## 🏗️ Architecture & Features
@@ -62,4 +68,4 @@ curl -X POST https://review-intelligence.onrender.com/analyze \
 
 ---
 
-> Built with ❤️. Hosted entirely free for portfolio demonstration.
+> Built with Love. Hosted entirely free for portfolio demonstration.
