@@ -5,6 +5,7 @@ import time
 import random
 from datetime import datetime
 import os
+from urllib.parse import urlparse, unquote
 
 try:
     from fake_useragent import UserAgent
@@ -97,6 +98,22 @@ def get_sample_reviews(industry="FMCG"):
     df["source"] = "Sample Data"
     return df
 
+def normalize_serper_query(query_or_url):
+    """Convert a URL or brand string into a Serper-friendly search query."""
+    value = (query_or_url or "").strip()
+    if not value:
+        return "customer reviews"
+
+    parsed = urlparse(value)
+    if parsed.scheme and parsed.netloc:
+        host_parts = [part for part in parsed.netloc.split(".") if part and part not in {"www", "com", "in", "co", "uk"}]
+        path_parts = [part for part in unquote(parsed.path).split("/") if part]
+        tokens = host_parts + path_parts
+        if tokens:
+            return " ".join(tokens)
+
+    return value
+
 def scrape_google_serper(query_or_url, industry):
     api_key = os.getenv("SERPER_API_KEY")
     if not api_key:
@@ -105,12 +122,14 @@ def scrape_google_serper(query_or_url, industry):
         
     try:
         url = "https://google.serper.dev/search"
-        payload = {"q": f"{query_or_url} customer feedback reviews"}
+        search_query = normalize_serper_query(query_or_url)
+        payload = {"q": f"{search_query} customer reviews feedback"}
         headers = {
             'X-API-KEY': api_key,
             'Content-Type': 'application/json'
         }
         res = requests.post(url, headers=headers, json=payload, timeout=10)
+        res.raise_for_status()
         data = res.json()
         
         reviews = []
@@ -130,6 +149,7 @@ def scrape_google_serper(query_or_url, industry):
             df["date"] = pd.to_datetime(df["date"])
             print(f"Serper.dev fetched {len(df)} snippets.")
             return df
+        print("Serper returned no usable snippets. Using sample data.")
     except Exception as e:
         print(f"Serper API failed: {e}")
     return get_sample_reviews(industry)
@@ -153,6 +173,7 @@ def scrape_reviews(url, industry="FMCG", use_sample=True):
         print(f"Attempting generic scrape: {url}")
         time.sleep(random.uniform(1, 2))
         response = requests.get(url, headers=get_random_headers(), timeout=10)
+        response.raise_for_status()
         soup = BeautifulSoup(response.text, "html.parser")
 
         reviews = []
@@ -175,13 +196,12 @@ def scrape_reviews(url, industry="FMCG", use_sample=True):
             df["date"] = pd.to_datetime(df["date"])
             print(f"Scraped {len(df)} reviews.")
             return df
-        else:
-            print("No reviews found via scraping. Falling back to sample data.")
-            return get_sample_reviews(industry)
+        print("No reviews found via generic scraping. Trying Serper search instead.")
+        return scrape_google_serper(url, industry)
 
     except Exception as e:
-        print(f"Scraping failed: {e}. Using sample data instead.")
-        return get_sample_reviews(industry)
+        print(f"Scraping failed: {e}. Trying Serper search instead.")
+        return scrape_google_serper(url, industry)
 
 def get_industry_keywords(industry):
     """Returns relevant keywords for the selected industry"""

@@ -142,6 +142,10 @@ if analyze_btn:
     st.session_state.pop("review_intel_pdf", None)
     st.session_state.pop("review_intel_pdf_name", None)
 
+    if data_mode == "Enter URL" and not url.strip():
+        st.error("Enter a business URL before clicking Analyze Reviews.")
+        st.stop()
+
     with st.spinner(f"Fetching and analyzing {industry} reviews..."):
         use_sample = data_mode == "Sample Data (Demo)"
         df_raw = scrape_reviews(url=url, industry=industry, use_sample=use_sample)
@@ -203,7 +207,8 @@ ACTION: your recommendation
     industry2_saved = None
     if compare_mode and (url2 or data_mode == "Sample Data (Demo)"):
         with st.spinner("Analyzing competitor..."):
-            df_raw2 = scrape_reviews(url=url2, industry=industry2, use_sample=True)
+            use_sample2 = data_mode == "Sample Data (Demo)"
+            df_raw2 = scrape_reviews(url=url2, industry=industry2, use_sample=use_sample2)
             df2 = run_full_analysis(df_raw2, industry2)
             stats2 = get_summary_stats(df2)
         industry2_saved = industry2
